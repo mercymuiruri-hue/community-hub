@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import API from '../api';
 
 const Login = () => {
   const [formData, setFormData] = useState({ identifier: '', password: '' });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -14,19 +15,25 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
     try {
-      // Sends 'identifier' (username or email) and 'password' to your backend
       const res = await API.post('/auth/login', {
-        email: formData.identifier, // backend can accept this or username
-        username: formData.identifier,
+        identifier: formData.identifier,
         password: formData.password
       });
 
       localStorage.setItem('token', res.data.token);
+      if (res.data.user) {
+        localStorage.setItem('user', JSON.stringify(res.data.user));
+      }
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Access Denied. Check your credentials.');
+      setError(
+        err.response?.data?.message || 'Access Denied. Check your credentials.'
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -35,7 +42,9 @@ const Login = () => {
       <div style={styles.card}>
         <div style={styles.badge}>QUANTUM LOGIC VERIFICATION</div>
         <h2 style={styles.title}>System Login</h2>
-        <p style={styles.subtitle}>Enter your username or email to access the terminal.</p>
+        <p style={styles.subtitle}>
+          Enter your username or email to access the terminal.
+        </p>
 
         {error && <div style={styles.errorBox}>{error}</div>}
 
@@ -66,13 +75,16 @@ const Login = () => {
             />
           </div>
 
-          <button type="submit" style={styles.button}>
-            Authenticate Session
+          <button type="submit" style={styles.button} disabled={loading}>
+            {loading ? 'Authenticating...' : 'Authenticate Session'}
           </button>
         </form>
 
         <p style={styles.footerText}>
-          New to the system? <Link to="/register" style={styles.link}>Request Registration</Link>
+          New to the system?{' '}
+          <Link to="/register" style={styles.link}>
+            Request Registration
+          </Link>
         </p>
       </div>
     </div>
@@ -96,7 +108,8 @@ const styles = {
     backgroundColor: '#0f172a',
     borderRadius: '16px',
     border: '1px solid #1e293b',
-    boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5)',
+    boxShadow:
+      '0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5)',
     padding: '32px',
     boxSizing: 'border-box',
   },
@@ -185,4 +198,4 @@ const styles = {
   },
 };
 
-export default Login;
+export default register;
