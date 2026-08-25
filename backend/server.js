@@ -3,16 +3,19 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 
+const app = express(); // 1. Define app right away
 
 const authRoutes = require('./routes/auth');
+
+// 2. Use middleware and routes after app is defined
 app.use(cors());
 app.use(express.json());
 
 // Mount auth routes
 app.use('/api/auth', authRoutes);
-const app = express();
-app.use(cors());
-app.use(express.json());
+
+// 3. Connect to MongoDB Atlas Cloud
+const mongoUri = process.env.MONGO_URI;
 
 // 1. Connect to MongoDB Atlas Cloud
 const mongoUri = process.env.MONGO_URI;
