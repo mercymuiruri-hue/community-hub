@@ -17,9 +17,6 @@ app.use('/api/auth', authRoutes);
 // 3. Connect to MongoDB Atlas Cloud
 const mongoUri = process.env.MONGO_URI;
 
-// 1. Connect to MongoDB Atlas Cloud
-const mongoUri = process.env.MONGO_URI;
-
 mongoose.connect(mongoUri)
   .then(() => console.log(' Connected to MongoDB Atlas Cloud Successfully!'))
   .catch(err => console.error(' MongoDB Connection Error:', err));
